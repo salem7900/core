@@ -3,14 +3,14 @@
 int	ft_putnbr_pf(int i)
 {
 	long	n;
-	int		len;
+	int		count;
 
 	n = i;
-	len = 0;
+	count = 0;
 	if (n < 0)
 	{
-		write(1, '-', 1);
-		len++;
+		write(1, "-", 1);
+		count++;
 		n = n * -1;
 	}
 	if (n > 9)

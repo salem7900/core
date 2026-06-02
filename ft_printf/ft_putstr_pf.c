@@ -1,4 +1,4 @@
-#include "ft_printf.c"
+#include "ft_printf.h"
 
 int	ft_putstr_pf(char *str)
 {
