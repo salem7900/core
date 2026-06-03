@@ -14,5 +14,10 @@
 
 char	*get_next_line(int fd)
 {
+    void           *ptr;
+    size_t          buffer;
+    static size_t   n;
 
+    n = read(fd, &ptr[buffer], buffer);
+    return (ptr);
 }
