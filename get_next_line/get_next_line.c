@@ -12,27 +12,47 @@
 
 #include "get_next_line.h"
 
-static char *newline(int fd, char *ptr)
+char	*newline(char **stash)
 {
-	size_t	n;
-	char	*buffer;
-	size_t	nbyte;
+	size_t	i;
+	char	*dest;
+	char	*new_stash;
 
-	n = 0;
-	buffer = malloc(BUFFER_SIZE + 1);
-	nbyte = read(fd, buffer, BUFFER_SIZE);
-	if(nbyte > 0)
-		buffer[nbyte] = '\0';
-	while (buffer[n])
-	{
-		*ptr = buffer[n];
-		if (buffer[n] == '\n')
-			return (ptr);
+	i = 0;
+	if (!*stash || **stash == '\0')
+		return (NULL);
+	while ((*stash)[i] == '\n' && (*stash)[i])
+		i++;
+	if ((*stash)[i] == '\n')
+		i++;
+	dest = ft_substr(*stash, 0, i);
+	new_stash = ft_strdup(*stash + i);
+	free(*stash);
+	*stash = new_stash;
+	return(dest);
+}
+	
 char	*get_next_line(int fd)
 {
-	static char	*ptr;
-	size_t          buffer;
-	size_t		n;
-	
-	return (ptr);
+	static char	*stash;
+	char 		*buffer;
+	size_t		nbyte;
+
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	nbyte = 1;
+	while (nbyte > 0 && !ft_strchr(stash, '/n'))
+	{
+		nbyte = read(fd, buffer, BUFFER_SIZE);
+		if (nbyte == -1)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[nbyte] = '\0';
+		stash = ft_strjoin(stash, buffer);
+	}
+	free(buffer);
+	return(newline(&stash));
 }
