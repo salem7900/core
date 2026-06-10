@@ -6,7 +6,7 @@
 /*   By: sabdalla <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/03 13:39:29 by sabdalla          #+#    #+#             */
-/*   Updated: 2026/06/08 13:41:22 by sabdalla         ###   ########.fr       */
+/*   Updated: 2026/06/10 11:53:04 by sabdalla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ char	*ft_strchr(const char *s, int c)
 
 char	*ft_strdup(const char *s)
 {
-	int		len;
+	size_t	len;
 	char	*dest;
-	int		i;
+	size_t	i;
 
 	len = 0;
 	while (s[len])
@@ -54,24 +54,45 @@ char	*ft_strdup(const char *s)
 	return (dest);
 }
 
-char	*newline(char **stash)
+static char	*extract_line(char **stash, size_t i)
 {
-	size_t	i;
 	char	*dest;
 	char	*new_stash;
 
-	i = 0;
-	if (!*stash || **stash == '\0')
-		return (NULL);
-	while ((*stash)[i] != '\n' && (*stash)[i])
-		i++;
 	if ((*stash)[i] == '\n')
 		i++;
 	dest = ft_substr(*stash, 0, i);
+	if (!dest)
+		return (NULL);
 	new_stash = ft_strdup(*stash + i);
+	if (!new_stash)
+	{
+		free(dest);
+		free(*stash);
+		*stash = NULL;
+		return (NULL);
+	}
 	free(*stash);
 	*stash = new_stash;
 	return (dest);
+}
+
+static char	*newline(char **stash)
+{
+	size_t	i;
+
+	i = 0;
+	if (!*stash)
+		return (NULL);
+	if (**stash == '\0')
+	{
+		free(*stash);
+		*stash = NULL;
+		return (NULL);
+	}
+	while ((*stash)[i] && (*stash)[i] != '\n')
+		i++;
+	return (extract_line(stash, i));
 }
 
 char	*get_next_line(int fd)
@@ -82,7 +103,7 @@ char	*get_next_line(int fd)
 	char		*tmp;
 
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (NULL);
+		return (free(stash), stash = NULL, NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
@@ -91,15 +112,12 @@ char	*get_next_line(int fd)
 	{
 		nbyte = read(fd, buffer, BUFFER_SIZE);
 		if (nbyte == -1)
-		{
-			free(buffer);
-			free(stash);
-			stash = NULL;
-			return (NULL);
-		}
+			return (free(buffer), free(stash), stash = NULL, NULL);
 		buffer[nbyte] = '\0';
 		tmp = ft_strjoin(stash, buffer);
 		free(stash);
+		if (!tmp)
+			return (free(buffer), stash = NULL, NULL);
 		stash = tmp;
 	}
 	free(buffer);
