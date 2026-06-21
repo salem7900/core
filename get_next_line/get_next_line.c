@@ -102,8 +102,8 @@ char	*get_next_line(int fd)
 	ssize_t		nbyte;
 	char		*tmp;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
-		return (free(stash), stash = NULL, NULL);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
